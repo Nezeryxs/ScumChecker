@@ -1,5 +1,12 @@
 # ScumChecker
 
+![GitHub release](https://img.shields.io/github/v/release/Nezeryxs/ScumChecker?style=flat-square)
+![GitHub downloads](https://img.shields.io/github/downloads/Nezeryxs/ScumChecker/total?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/Nezeryxs/ScumChecker?style=flat-square)
+![Platform](https://img.shields.io/badge/platform-Windows-blue?style=flat-square)
+![Made with C#](https://img.shields.io/badge/Made%20with-C%23-239120?style=flat-square)
+![Status](https://img.shields.io/badge/status-active-success?style=flat-square)
+
 **ScumChecker** — офлайн-инструмент для администраторов серверов **SCUM**, предназначенный для помощи при ручных проверках игроков.
 
 Программа анализирует локальное окружение игрока и отображает информацию **исключительно на экране администратора**.  
@@ -49,11 +56,11 @@ ScumChecker:
 
 ## 🚀 Использование
 
-1. Скачайте последний релиз
+1. Скачайте последний релиз из раздела **Releases**
 2. Запустите `ScumChecker.exe` **от имени администратора**
 3. Нажмите **Scan**
 4. Изучите результаты и Steam-аккаунты
-5. Используйте double-click для открытия файлов или профилей
+5. Используйте **double-click** для открытия файлов или Steam-профилей
 
 ---
 

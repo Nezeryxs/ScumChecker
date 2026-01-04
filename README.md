@@ -10,6 +10,7 @@ ScumChecker не отправляет данные, не загружает фа
 ## 🖥 Интерфейс
 
 ![Main Scan](assets/gl.png)
+![Steam Scan](assets/steam.png)
 
 ---
 

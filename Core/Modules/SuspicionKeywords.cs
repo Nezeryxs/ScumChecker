@@ -1,39 +1,241 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ScumChecker.Core.Modules
 {
     public static class SuspicionKeywords
     {
-        // слова, которые часто встречаются в плохом софте / обходах
+        // ========== Ключевые слова (более строгие, меньше ложных)
         public static readonly string[] Generic =
         [
-            "inject", "injector", "injection",
-            "bypass", "spoof", "spoofer",
-            "mapper", "kdmapper",
-            "hook", "hooks",
-            "overlay",
-            "aim", "aimbot", "trigger", "silent",
-            "esp", "wallhack", "radar",
-            "macro", "autoclick", "autoclicker",
-            "unban", "hwid", "serial"
+            // injection / drivers / kernel
+            "injector", "injection", "dll injector", "manual map", "manualmap",
+            "mapper", "kdmapper", "drvmap", "driver mapper", "kernel driver",
+            "ring0", "ring 0", "kernelmode", "kernel mode",
+            "vulnerable driver", "rtcore64", "gdrv", "asrdrv", "capcom",
+
+            // bypass / spoof / hwid
+            "bypass", "anti-cheat bypass", "anticheat bypass",
+            "spoofer", "spoofing", "hwid spoofer", "hwid spoof",
+            "serial spoof", "disk serial", "volumeid", "smbios", "mac spoof",
+
+            // hooks / overlays
+            "hooking", "setwindowshookex", "detour", "detours", "minhook",
+            "present hook", "d3d hook", "dxgi hook", "swapchain",
+            "imgui", "dear imgui",
+
+            // cheat features
+            "aimbot", "triggerbot", "silentaim", "silent aim",
+            "wallhack", "wh", "esp", "radarhack", "radar hack",
+            "chams", "norecoil", "no recoil", "nospread", "no spread",
+            "bhop", "bunnyhop", "speedhack", "flyhack",
+            "noclip", "freecam", "hitbox", "magic bullet",
+
+            // macros
+            "autoclicker", "auto clicker", "autofire", "auto fire",
+            "recoil macro", "no recoil macro", "macros", "macro",
+
+            "cfg", "config",
+
+            // unban / unlock
+            "unban", "unlocker", "unlock all", "vac bypass", "vac bypasser"
         ];
 
-        // dev/reverse инструменты (не чит, но может быть “подозрительным контекстом”)
+        // SCUM бренды/триггеры
+        public static readonly string[] ScumNames =
+        [
+            "scum [ingram]",
+            "scum [shack]",
+            "pheonix [scum]",
+            "scum [aj]",
+            "scum [arcane]",
+            "scum [baunti]",
+            "scum [ca]",
+            "scum [hc]",
+            "scum [mason]",
+
+            "scum aimbot",
+            "scum esp",
+            "scum wallhack",
+            "scum radar",
+            "scum loot esp",
+            "scum item esp",
+            "scum triggerbot",
+            "scum silent aim",
+            "scum norecoil",
+            "scum no recoil",
+            "scum speedhack",
+            "scum flyhack",
+            "scum teleport",
+            "scum hwid spoofer",
+            "scum unban",
+            "scum undetected"
+        ];
+
+        // dev/reverse инструменты
         public static readonly string[] DevTools =
         [
             "dnspy", "ilspy", "x64dbg", "x32dbg", "ollydbg",
-            "decompiler", "debugger", "debug"
+            "ghidra", "ida", "ida64", "ida pro",
+            "cheat engine", "cheatengine", "process hacker", "procexp",
+            "decompiler", "debugger", "debug",
+            "api monitor", "fiddler", "wireshark"
         ];
 
-        public static bool ContainsAny(string text, string[] list)
+        // ====== Критичные (красные) слова/бренды -> для High
+        public static readonly string[] Critical =
+        [
+            "cfg", "config", "esp", "wh", "aim", "vac", "bhop",
+            "ingram", "shack", "pheonix", "aj", "arcane", "baunt", "mason",
+            "hyper", "dma", "external", "xone", "interium", "midnight", "loader",
+        ];
+
+        // матчим аккуратно: токены/слова/части имени + расширение .cfg
+        private static readonly Regex CriticalRegex = new Regex(
+            $@"(?i)(?<!\w)({string.Join("|", Critical.Select(Regex.Escape))})(?!\w)|(\.cfg\b)",
+            RegexOptions.Compiled
+        );
+
+        public static bool ContainsCritical(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return false;
+            return CriticalRegex.IsMatch(text);
+        }
+
+        // короткие токены лучше искать как отдельные слова
+        private static readonly string[] ShortTokens =
+        [
+            "wh", "esp", "bhop", "vac", "hwid", "kdmapper"
+        ];
+
+        private static readonly Regex ShortTokenRegex = new Regex(
+            $@"(?<!\w)({string.Join("|", ShortTokens.Select(Regex.Escape))})(?!\w)",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase
+        );
+
+        /// <summary>
+        /// Проверка: содержит ли текст любые ключевики из массивов.
+        /// </summary>
+        public static bool ContainsAny(string text, params string[][] lists)
         {
             if (string.IsNullOrWhiteSpace(text)) return false;
 
-            foreach (var k in list)
-                if (text.Contains(k, StringComparison.OrdinalIgnoreCase))
-                    return true;
+            var s = text.ToLowerInvariant();
+
+            // 1) regex для коротких токенов
+            if (ShortTokenRegex.IsMatch(s))
+                return true;
+
+            // 2) обычные contains для остальных
+            foreach (var list in lists)
+            {
+                foreach (var k in list)
+                {
+                    if (string.IsNullOrWhiteSpace(k)) continue;
+                    if (s.Contains(k.ToLowerInvariant()))
+                        return true;
+                }
+            }
 
             return false;
+        }
+
+        // =========================================================
+        // PATH / DIRECTORY / FILE checks
+        // =========================================================
+
+        /// <summary>
+        /// Главная проверка пути: файл или папка.
+        /// </summary>
+        public static bool IsPathSuspicious(string path, bool treatDevToolsAsSuspicious = false)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return false;
+
+            if (Directory.Exists(path))
+                return IsDirectorySuspicious(path, treatDevToolsAsSuspicious);
+
+            if (File.Exists(path))
+                return IsFileSuspicious(path, treatDevToolsAsSuspicious);
+
+            return false;
+        }
+
+        /// <summary>
+        /// Проверка папки по названию/пути.
+        /// </summary>
+        public static bool IsDirectorySuspicious(string dirPath, bool treatDevToolsAsSuspicious = false)
+        {
+            if (string.IsNullOrWhiteSpace(dirPath) || !Directory.Exists(dirPath))
+                return false;
+
+            var haystack = $"{dirPath} {Path.GetFileName(dirPath)}";
+
+            // 1) критичные (High)
+            if (ContainsCritical(haystack))
+                return true;
+
+            // 2) обычные ключевики + SCUM
+            if (ContainsAny(haystack, Generic, ScumNames))
+                return true;
+
+            // 3) DevTools опционально
+            if (treatDevToolsAsSuspicious && ContainsAny(haystack, DevTools))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Главная проверка файла: НЕ триггериться на файлы с валидной цифровой подписью.
+        /// </summary>
+        public static bool IsFileSuspicious(string filePath, bool treatDevToolsAsSuspicious = false)
+        {
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+                return false;
+
+            // если подписан валидно — считаем не подозрительным
+            if (HasValidDigitalSignature(filePath))
+                return false;
+
+            var haystack = $"{filePath} {Path.GetFileName(filePath)}";
+
+            // критичные тоже считаем подозрительными
+            if (ContainsCritical(haystack))
+                return true;
+
+            if (ContainsAny(haystack, Generic, ScumNames))
+                return true;
+
+            if (treatDevToolsAsSuspicious && ContainsAny(haystack, DevTools))
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Валидная цифровая подпись (Authenticode)
+        /// </summary>
+        public static bool HasValidDigitalSignature(string filePath)
+        {
+            try
+            {
+                var cert = new X509Certificate2(X509Certificate.CreateFromSignedFile(filePath));
+
+                using var chain = new X509Chain();
+                chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;
+                chain.ChainPolicy.RevocationFlag = X509RevocationFlag.ExcludeRoot;
+                chain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag;
+                chain.ChainPolicy.VerificationTime = DateTime.UtcNow;
+
+                return chain.Build(cert);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

@@ -42,6 +42,9 @@ All processing is performed **locally on the administrator’s machine**.
 - Запустите `ScumChecker.exe` **от имени администратора**
 - Установка не требуется
 
+- 👉 **Download here:** https://github.com/Nezeryxs/ScumChecker/releases/latest
+
+
 ---
 
 ### 🇬🇧 How to download ScumChecker

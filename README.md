@@ -29,10 +29,16 @@ All processing is performed **locally on the administrator’s machine**.
 
 ## 🖥 Интерфейс / Interface
 
-<img width="400" alt="Main Scan" src="assets/mainmenu.png" />
-<img width="400" alt="Steam Scan" src="assets/steammenu.png" />
-<img width="400" alt="Programs" src="assets/progmenu.png" />
-<img width="400" alt="Tools" src="assets/toolmenu.png" />
+<table>
+  <tr>
+    <td><img width="420" alt="Main Scan" src="assets/mainmenu.png"></td>
+    <td><img width="420" alt="Steam Scan" src="assets/steammenu.png"></td>
+  </tr>
+  <tr>
+    <td><img width="420" alt="Programs" src="assets/progmenu.png"></td>
+    <td><img width="420" alt="Tools" src="assets/toolmenu.png"></td>
+  </tr>
+</table>
 
 
 ---

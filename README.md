@@ -29,7 +29,7 @@ All processing is performed **locally on the administrator’s machine**.
 
 ## 🖥 Интерфейс / Interface
 
-![Main Scan](assets/mainmenu.png)
+![Main Scan](assets/mainmenu2.png)
 ![Steam Scan](assets/steammenu.png)
 ![Programs](assets/progmenu.png)
 ![Tools](assets/toolmenu.png)

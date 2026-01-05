@@ -26,6 +26,39 @@ ScumChecker **does not send data**, **does not upload files**, and **does not co
 All processing is performed **locally on the administrator’s machine**.
 
 ---
+## ⬇️ Скачать / Download
+
+### 🇷🇺 Как скачать ScumChecker
+
+> ⚠️ **Не скачивайте через кнопку `Code → Download ZIP`** — это исходный код, он **не запустится**.
+
+1. Перейдите в раздел **Releases** (справа на странице репозитория)
+2. Откройте **последний релиз** (помечен как `Latest`)
+3. В разделе **Assets** скачайте файл:
+   - `ScumChecker.exe`
+   - или архив с программой (если есть)
+
+После загрузки:
+- Запустите `ScumChecker.exe` **от имени администратора**
+- Установка не требуется
+
+---
+
+### 🇬🇧 How to download ScumChecker
+
+> ⚠️ **Do NOT use `Code → Download ZIP`** — this is the source code and **it will not run**.
+
+1. Go to the **Releases** section (on the right side of the repository page)
+2. Open the **latest release** (marked as `Latest`)
+3. In the **Assets** section, download:
+   - `ScumChecker.exe`
+   - or the archive containing the application (if available)
+
+After downloading:
+- Run `ScumChecker.exe` **as Administrator**
+- No installation required
+
+---
 
 ## 🖥 Интерфейс / Interface
 

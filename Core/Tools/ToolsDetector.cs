@@ -13,6 +13,9 @@ namespace ScumChecker.Core.Tools
             _baseDir = dir;
         }
 
+
+
+
         private static string GetBaseDirectory()
         {
             // если задали — используем
@@ -42,10 +45,6 @@ namespace ScumChecker.Core.Tools
                 fileNames: new[] { "Everything.exe" },
                 downloadUrl: "https://www.voidtools.com/downloads/"));
 
-            list.Add(DetectFromProgramsDir(
-                name: "ShellBags Explorer (EZTools)",
-                fileNames: new[] { "ShellBagsExplorer.exe", "ShellBagsExplorer64.exe" },
-                downloadUrl: "https://ericzimmerman.github.io/"));
 
             // === Со скрина / portable ===
             list.Add(DetectFromProgramsDir(
@@ -60,8 +59,8 @@ namespace ScumChecker.Core.Tools
 
             list.Add(DetectFromProgramsDir(
                 name: "JournalTrace",
-                fileNames: new[] { "JournalTrace.exe", "JournalTrace (1).exe" },
-                downloadUrl: "")); // если нет ссылки — оставь пусто
+                fileNames: new[] { "JournalTrace.exe" },
+                downloadUrl: "https://github.com/ponei/JournalTrace/releases")); // если нет ссылки — оставь пусто
 
             list.Add(DetectFromProgramsDir(
                 name: "LastActivityView (NirSoft)",
@@ -80,8 +79,8 @@ namespace ScumChecker.Core.Tools
 
             list.Add(DetectFromProgramsDir(
                 name: "Shellbag Analyzer/Cleaner",
-                fileNames: new[] { "shellbag_analyzer_cleaner.exe", "shellbag_analyzer_cleaner (1).exe" },
-                downloadUrl: "")); // если это твой файл — тоже можно пусто
+                fileNames: new[] { "shellbag_analyzer_cleaner.exe" },
+                downloadUrl: "https://privazer.com/ru/download-shellbag-analyzer-shellbag-cleaner.php")); // если это твой файл — тоже можно пусто
 
             return list;
         }

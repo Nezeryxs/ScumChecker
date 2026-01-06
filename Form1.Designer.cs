@@ -8,12 +8,14 @@ namespace ScumChecker
     partial class Form1
     {
         private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.Panel panelToolsListHost;
+
+
 
         // ===== Root layout
         private System.Windows.Forms.Panel panelSidebar;
         private System.Windows.Forms.Panel panelMain;
         private System.Windows.Forms.Panel panelPages;
-        private System.Windows.Forms.Panel panelFooter;
 
         // Sidebar buttons
         private System.Windows.Forms.Label lblAppTitle;
@@ -26,9 +28,6 @@ namespace ScumChecker
         // Footer
         private System.Windows.Forms.LinkLabel linkGitHub;
         private System.Windows.Forms.LinkLabel linkBio;
-        private System.Windows.Forms.Label lblMadeWith;
-        private System.Windows.Forms.Label lblLang;
-        private System.Windows.Forms.ComboBox cmbLang;
 
         // ===== Pages
         private System.Windows.Forms.Panel pageNative;
@@ -105,11 +104,36 @@ namespace ScumChecker
         private System.Windows.Forms.DataGridViewTextBoxColumn colToolPath;
 
         // ===== Quick page
+        // Ну типо открытие быстрых мест и прочая херня
+
+        private System.Windows.Forms.Button btnOpenPrefetch;
+        private System.Windows.Forms.Button btnOpenEventViewer;
+        private System.Windows.Forms.Button btnOpenLocalAppData;
+
+        private System.Windows.Forms.Button btnOpenChromeProfile;
+        private System.Windows.Forms.Button btnOpenEdgeProfile;
+        private System.Windows.Forms.Button btnOpenFirefoxProfiles;
+        private System.Windows.Forms.Button btnOpenBrowserCache;
+
+        private System.Windows.Forms.Button btnOpenRecent;
+        private System.Windows.Forms.Button btnOpenDesktop;
+
         private System.Windows.Forms.Panel panelQuickTop;
         private System.Windows.Forms.Label lblQuickTitle;
         private System.Windows.Forms.Label lblQuickDesc;
         private System.Windows.Forms.FlowLayoutPanel flowQuick;
 
+        // Проверка на покупок читов 
+        private Button btnOpenYougame = null!;
+        private Button btnOpenDragonHack = null!;
+        private Button btnOpenUpGame = null!;
+        private Button btnOpenIndustries = null!;
+        private Button btnOpenCheatrise = null!;
+        private Button btnOpenCyberhack = null!;
+        private Button btnOpenSoftix = null!;
+        private Button btnOpenScumFolder = null!;
+
+        // Ну типо открытие быстрых мест 
         private System.Windows.Forms.Button btnOpenRegedit;
         private System.Windows.Forms.Button btnOpenTemp;
         private System.Windows.Forms.Button btnOpenDownloads;
@@ -134,14 +158,30 @@ namespace ScumChecker
             DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            btnOpenPrefetch = new Button();
+            btnOpenEventViewer = new Button();
+            btnOpenLocalAppData = new Button();
+            btnOpenChromeProfile = new Button();
+            btnOpenEdgeProfile = new Button();
+            btnOpenFirefoxProfiles = new Button();
+            btnOpenBrowserCache = new Button();
+            btnOpenRecent = new Button();
+            btnOpenDesktop = new Button();
             panelSidebar = new Panel();
-            button1 = new Button();
+            ezbio = new Button();
+            Git_button = new Button();
+            panelFooter = new Panel();
+            lblLang = new Label();
+            cmbLang = new ComboBox();
             btnNavQuick = new Button();
             btnNavTools = new Button();
             btnNavSteam = new Button();
             btnNavNative = new Button();
             sidebarSpacer = new Panel();
+            panel1 = new Panel();
             lblAppTitle = new Label();
+            button1 = new Button();
+            panelToolsListHost = new Panel();
             panelMain = new Panel();
             panelPages = new Panel();
             pageQuick = new Panel();
@@ -208,13 +248,14 @@ namespace ScumChecker
             lblCountMedium = new Label();
             lblCountLow = new Label();
             lblCountInfo = new Label();
-            panelFooter = new Panel();
+            PanelLogo = new Panel();
+            button3akrit = new Button();
+            buttonSvernut = new Button();
             linkGitHub = new LinkLabel();
             linkBio = new LinkLabel();
-            lblLang = new Label();
-            cmbLang = new ComboBox();
-            lblMadeWith = new Label();
             panelSidebar.SuspendLayout();
+            panelFooter.SuspendLayout();
+            panel1.SuspendLayout();
             panelMain.SuspendLayout();
             panelPages.SuspendLayout();
             pageQuick.SuspendLayout();
@@ -238,19 +279,84 @@ namespace ScumChecker
             panelTop.SuspendLayout();
             panelProgressTrack.SuspendLayout();
             panelSummary.SuspendLayout();
-            panelFooter.SuspendLayout();
+            PanelLogo.SuspendLayout();
             SuspendLayout();
+            // 
+            // btnOpenPrefetch
+            // 
+            btnOpenPrefetch.Location = new Point(570, 15);
+            btnOpenPrefetch.Name = "btnOpenPrefetch";
+            btnOpenPrefetch.Size = new Size(75, 23);
+            btnOpenPrefetch.TabIndex = 7;
+            // 
+            // btnOpenEventViewer
+            // 
+            btnOpenEventViewer.Location = new Point(651, 15);
+            btnOpenEventViewer.Name = "btnOpenEventViewer";
+            btnOpenEventViewer.Size = new Size(75, 23);
+            btnOpenEventViewer.TabIndex = 8;
+            // 
+            // btnOpenLocalAppData
+            // 
+            btnOpenLocalAppData.Location = new Point(489, 15);
+            btnOpenLocalAppData.Name = "btnOpenLocalAppData";
+            btnOpenLocalAppData.Size = new Size(75, 23);
+            btnOpenLocalAppData.TabIndex = 6;
+            // 
+            // btnOpenChromeProfile
+            // 
+            btnOpenChromeProfile.Location = new Point(732, 15);
+            btnOpenChromeProfile.Name = "btnOpenChromeProfile";
+            btnOpenChromeProfile.Size = new Size(75, 23);
+            btnOpenChromeProfile.TabIndex = 9;
+            // 
+            // btnOpenEdgeProfile
+            // 
+            btnOpenEdgeProfile.Location = new Point(813, 15);
+            btnOpenEdgeProfile.Name = "btnOpenEdgeProfile";
+            btnOpenEdgeProfile.Size = new Size(75, 23);
+            btnOpenEdgeProfile.TabIndex = 10;
+            // 
+            // btnOpenFirefoxProfiles
+            // 
+            btnOpenFirefoxProfiles.Location = new Point(894, 15);
+            btnOpenFirefoxProfiles.Name = "btnOpenFirefoxProfiles";
+            btnOpenFirefoxProfiles.Size = new Size(75, 23);
+            btnOpenFirefoxProfiles.TabIndex = 11;
+            // 
+            // btnOpenBrowserCache
+            // 
+            btnOpenBrowserCache.Location = new Point(3, 44);
+            btnOpenBrowserCache.Name = "btnOpenBrowserCache";
+            btnOpenBrowserCache.Size = new Size(75, 23);
+            btnOpenBrowserCache.TabIndex = 12;
+            // 
+            // btnOpenRecent
+            // 
+            btnOpenRecent.Location = new Point(84, 44);
+            btnOpenRecent.Name = "btnOpenRecent";
+            btnOpenRecent.Size = new Size(75, 23);
+            btnOpenRecent.TabIndex = 13;
+            // 
+            // btnOpenDesktop
+            // 
+            btnOpenDesktop.Location = new Point(165, 44);
+            btnOpenDesktop.Name = "btnOpenDesktop";
+            btnOpenDesktop.Size = new Size(75, 23);
+            btnOpenDesktop.TabIndex = 14;
             // 
             // panelSidebar
             // 
-            panelSidebar.BackColor = Color.FromArgb(10, 10, 16);
-            panelSidebar.Controls.Add(button1);
+            panelSidebar.BackColor = Color.FromArgb(1, 1, 9);
+            panelSidebar.Controls.Add(ezbio);
+            panelSidebar.Controls.Add(Git_button);
+            panelSidebar.Controls.Add(panelFooter);
             panelSidebar.Controls.Add(btnNavQuick);
             panelSidebar.Controls.Add(btnNavTools);
             panelSidebar.Controls.Add(btnNavSteam);
             panelSidebar.Controls.Add(btnNavNative);
             panelSidebar.Controls.Add(sidebarSpacer);
-            panelSidebar.Controls.Add(lblAppTitle);
+            panelSidebar.Controls.Add(panel1);
             panelSidebar.Dock = DockStyle.Left;
             panelSidebar.Location = new Point(0, 0);
             panelSidebar.Name = "panelSidebar";
@@ -258,16 +364,82 @@ namespace ScumChecker
             panelSidebar.Size = new Size(190, 720);
             panelSidebar.TabIndex = 1;
             // 
-            // button1
+            // ezbio
             // 
-            button1.FlatAppearance.BorderSize = 0;
-            button1.FlatStyle = FlatStyle.Flat;
-            button1.Image = Properties.Resources.ico;
-            button1.Location = new Point(12, 10);
-            button1.Name = "button1";
-            button1.Size = new Size(45, 58);
-            button1.TabIndex = 6;
-            button1.UseVisualStyleBackColor = true;
+            ezbio.BackColor = Color.Transparent;
+            ezbio.BackgroundImage = Properties.Resources.ezbio1;
+            ezbio.BackgroundImageLayout = ImageLayout.Zoom;
+            ezbio.Cursor = Cursors.Hand;
+            ezbio.Dock = DockStyle.Bottom;
+            ezbio.FlatAppearance.BorderSize = 0;
+            ezbio.FlatAppearance.MouseDownBackColor = Color.FromArgb(70, 120, 110, 255);
+            ezbio.FlatAppearance.MouseOverBackColor = Color.FromArgb(40, 120, 110, 255);
+            ezbio.FlatStyle = FlatStyle.Flat;
+            ezbio.ForeColor = Color.Transparent;
+            ezbio.Location = new Point(12, 564);
+            ezbio.Name = "ezbio";
+            ezbio.Size = new Size(166, 56);
+            ezbio.TabIndex = 7;
+            ezbio.TabStop = false;
+            ezbio.UseVisualStyleBackColor = false;
+            ezbio.Click += Git_button_Click;
+            // 
+            // Git_button
+            // 
+            Git_button.BackColor = Color.Transparent;
+            Git_button.BackgroundImage = Properties.Resources.Github_ico2;
+            Git_button.BackgroundImageLayout = ImageLayout.Zoom;
+            Git_button.Cursor = Cursors.Hand;
+            Git_button.Dock = DockStyle.Bottom;
+            Git_button.FlatAppearance.BorderSize = 0;
+            Git_button.FlatAppearance.MouseDownBackColor = Color.FromArgb(70, 120, 110, 255);
+            Git_button.FlatAppearance.MouseOverBackColor = Color.FromArgb(40, 120, 110, 255);
+            Git_button.FlatStyle = FlatStyle.Flat;
+            Git_button.ForeColor = Color.Transparent;
+            Git_button.Location = new Point(12, 620);
+            Git_button.Name = "Git_button";
+            Git_button.Size = new Size(166, 56);
+            Git_button.TabIndex = 0;
+            Git_button.TabStop = false;
+            Git_button.UseVisualStyleBackColor = false;
+            Git_button.Click += ezka_button_Click;
+            // 
+            // panelFooter
+            // 
+            panelFooter.BackColor = Color.FromArgb(1, 1, 9);
+            panelFooter.Controls.Add(lblLang);
+            panelFooter.Controls.Add(cmbLang);
+            panelFooter.Dock = DockStyle.Bottom;
+            panelFooter.Location = new Point(12, 676);
+            panelFooter.Name = "panelFooter";
+            panelFooter.Padding = new Padding(12, 8, 12, 8);
+            panelFooter.Size = new Size(166, 32);
+            panelFooter.TabIndex = 1;
+            panelFooter.Paint += panelFooter_Paint;
+            // 
+            // lblLang
+            // 
+            lblLang.AutoSize = true;
+            lblLang.BackColor = Color.FromArgb(1, 1, 9);
+            lblLang.ForeColor = Color.Gainsboro;
+            lblLang.Location = new Point(9, 9);
+            lblLang.Name = "lblLang";
+            lblLang.Size = new Size(36, 15);
+            lblLang.TabIndex = 2;
+            lblLang.Text = "Lang:";
+            // 
+            // cmbLang
+            // 
+            cmbLang.BackColor = Color.FromArgb(1, 1, 9);
+            cmbLang.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbLang.FlatStyle = FlatStyle.Flat;
+            cmbLang.ForeColor = Color.Gainsboro;
+            cmbLang.FormattingEnabled = true;
+            cmbLang.Items.AddRange(new object[] { "RU", "EN" });
+            cmbLang.Location = new Point(51, 6);
+            cmbLang.Name = "cmbLang";
+            cmbLang.Size = new Size(112, 23);
+            cmbLang.TabIndex = 3;
             // 
             // btnNavQuick
             // 
@@ -277,7 +449,7 @@ namespace ScumChecker
             btnNavQuick.FlatStyle = FlatStyle.Flat;
             btnNavQuick.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnNavQuick.ForeColor = Color.Gainsboro;
-            btnNavQuick.Location = new Point(12, 206);
+            btnNavQuick.Location = new Point(12, 230);
             btnNavQuick.Name = "btnNavQuick";
             btnNavQuick.Size = new Size(166, 44);
             btnNavQuick.TabIndex = 0;
@@ -292,7 +464,7 @@ namespace ScumChecker
             btnNavTools.FlatStyle = FlatStyle.Flat;
             btnNavTools.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnNavTools.ForeColor = Color.Gainsboro;
-            btnNavTools.Location = new Point(12, 162);
+            btnNavTools.Location = new Point(12, 186);
             btnNavTools.Name = "btnNavTools";
             btnNavTools.Size = new Size(166, 44);
             btnNavTools.TabIndex = 1;
@@ -307,7 +479,7 @@ namespace ScumChecker
             btnNavSteam.FlatStyle = FlatStyle.Flat;
             btnNavSteam.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnNavSteam.ForeColor = Color.Gainsboro;
-            btnNavSteam.Location = new Point(12, 118);
+            btnNavSteam.Location = new Point(12, 142);
             btnNavSteam.Name = "btnNavSteam";
             btnNavSteam.Size = new Size(166, 44);
             btnNavSteam.TabIndex = 2;
@@ -322,7 +494,7 @@ namespace ScumChecker
             btnNavNative.FlatStyle = FlatStyle.Flat;
             btnNavNative.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnNavNative.ForeColor = Color.White;
-            btnNavNative.Location = new Point(12, 74);
+            btnNavNative.Location = new Point(12, 98);
             btnNavNative.Name = "btnNavNative";
             btnNavNative.Size = new Size(166, 44);
             btnNavNative.TabIndex = 3;
@@ -333,33 +505,63 @@ namespace ScumChecker
             // 
             sidebarSpacer.BackColor = Color.Transparent;
             sidebarSpacer.Dock = DockStyle.Top;
-            sidebarSpacer.Location = new Point(12, 64);
+            sidebarSpacer.Location = new Point(12, 88);
             sidebarSpacer.Name = "sidebarSpacer";
             sidebarSpacer.Size = new Size(166, 10);
             sidebarSpacer.TabIndex = 4;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(lblAppTitle);
+            panel1.Controls.Add(button1);
+            panel1.Dock = DockStyle.Top;
+            panel1.Location = new Point(12, 12);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(166, 76);
+            panel1.TabIndex = 8;
             // 
             // lblAppTitle
             // 
             lblAppTitle.Dock = DockStyle.Top;
             lblAppTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblAppTitle.ForeColor = Color.White;
-            lblAppTitle.Location = new Point(12, 12);
+            lblAppTitle.Location = new Point(45, 0);
             lblAppTitle.Name = "lblAppTitle";
-            lblAppTitle.Size = new Size(166, 52);
+            lblAppTitle.Size = new Size(121, 52);
             lblAppTitle.TabIndex = 5;
             lblAppTitle.Text = "            ScumChecker";
             lblAppTitle.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // button1
+            // 
+            button1.Dock = DockStyle.Left;
+            button1.FlatAppearance.BorderSize = 0;
+            button1.FlatStyle = FlatStyle.Flat;
+            button1.Image = Properties.Resources.ico;
+            button1.Location = new Point(0, 0);
+            button1.Name = "button1";
+            button1.Size = new Size(45, 76);
+            button1.TabIndex = 6;
+            button1.UseVisualStyleBackColor = true;
+            // 
+            // panelToolsListHost
+            // 
+            panelToolsListHost.BackColor = Color.FromArgb(12, 12, 18);
+            panelToolsListHost.Dock = DockStyle.Fill;
+            panelToolsListHost.Location = new Point(0, 0);
+            panelToolsListHost.Name = "panelToolsListHost";
+            panelToolsListHost.Size = new Size(1010, 533);
+            panelToolsListHost.TabIndex = 1;
             // 
             // panelMain
             // 
             panelMain.BackColor = Color.Transparent;
             panelMain.Controls.Add(panelPages);
-            panelMain.Controls.Add(panelFooter);
             panelMain.Dock = DockStyle.Fill;
-            panelMain.Location = new Point(190, 0);
+            panelMain.Location = new Point(190, 27);
             panelMain.Name = "panelMain";
             panelMain.Padding = new Padding(12, 12, 12, 0);
-            panelMain.Size = new Size(1034, 720);
+            panelMain.Size = new Size(1034, 693);
             panelMain.TabIndex = 0;
             // 
             // panelPages
@@ -372,7 +574,7 @@ namespace ScumChecker
             panelPages.Dock = DockStyle.Fill;
             panelPages.Location = new Point(12, 12);
             panelPages.Name = "panelPages";
-            panelPages.Size = new Size(1010, 674);
+            panelPages.Size = new Size(1010, 681);
             panelPages.TabIndex = 0;
             // 
             // pageQuick
@@ -382,7 +584,7 @@ namespace ScumChecker
             pageQuick.Dock = DockStyle.Fill;
             pageQuick.Location = new Point(0, 0);
             pageQuick.Name = "pageQuick";
-            pageQuick.Size = new Size(1010, 674);
+            pageQuick.Size = new Size(1010, 681);
             pageQuick.TabIndex = 0;
             pageQuick.Visible = false;
             // 
@@ -395,11 +597,20 @@ namespace ScumChecker
             flowQuick.Controls.Add(btnOpenWindowsUpdate);
             flowQuick.Controls.Add(btnOpenAppData);
             flowQuick.Controls.Add(btnOpenSteamConfig);
+            flowQuick.Controls.Add(btnOpenLocalAppData);
+            flowQuick.Controls.Add(btnOpenPrefetch);
+            flowQuick.Controls.Add(btnOpenEventViewer);
+            flowQuick.Controls.Add(btnOpenChromeProfile);
+            flowQuick.Controls.Add(btnOpenEdgeProfile);
+            flowQuick.Controls.Add(btnOpenFirefoxProfiles);
+            flowQuick.Controls.Add(btnOpenBrowserCache);
+            flowQuick.Controls.Add(btnOpenRecent);
+            flowQuick.Controls.Add(btnOpenDesktop);
             flowQuick.Dock = DockStyle.Fill;
             flowQuick.Location = new Point(0, 78);
             flowQuick.Name = "flowQuick";
             flowQuick.Padding = new Padding(0, 12, 0, 0);
-            flowQuick.Size = new Size(1010, 596);
+            flowQuick.Size = new Size(1010, 603);
             flowQuick.TabIndex = 0;
             // 
             // btnOpenRegedit
@@ -485,18 +696,19 @@ namespace ScumChecker
             pageTools.Dock = DockStyle.Fill;
             pageTools.Location = new Point(0, 0);
             pageTools.Name = "pageTools";
-            pageTools.Size = new Size(1010, 674);
+            pageTools.Size = new Size(1010, 681);
             pageTools.TabIndex = 1;
             pageTools.Visible = false;
             // 
             // panelToolsGridHost
             // 
             panelToolsGridHost.BackColor = Color.FromArgb(12, 12, 18);
+            panelToolsGridHost.Controls.Add(panelToolsListHost);
             panelToolsGridHost.Controls.Add(dgvTools);
             panelToolsGridHost.Dock = DockStyle.Fill;
             panelToolsGridHost.Location = new Point(0, 78);
             panelToolsGridHost.Name = "panelToolsGridHost";
-            panelToolsGridHost.Size = new Size(1010, 526);
+            panelToolsGridHost.Size = new Size(1010, 533);
             panelToolsGridHost.TabIndex = 0;
             // 
             // dgvTools
@@ -534,8 +746,9 @@ namespace ScumChecker
             dgvTools.RowHeadersVisible = false;
             dgvTools.RowTemplate.Height = 28;
             dgvTools.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvTools.Size = new Size(1010, 526);
+            dgvTools.Size = new Size(1010, 533);
             dgvTools.TabIndex = 0;
+            dgvTools.Visible = false;
             // 
             // colTool
             // 
@@ -566,7 +779,7 @@ namespace ScumChecker
             panelToolsBottom.Controls.Add(btnDownloadTool);
             panelToolsBottom.Controls.Add(lblToolsHint);
             panelToolsBottom.Dock = DockStyle.Bottom;
-            panelToolsBottom.Location = new Point(0, 604);
+            panelToolsBottom.Location = new Point(0, 611);
             panelToolsBottom.Name = "panelToolsBottom";
             panelToolsBottom.Padding = new Padding(12);
             panelToolsBottom.Size = new Size(1010, 70);
@@ -664,7 +877,7 @@ namespace ScumChecker
             pageSteam.Dock = DockStyle.Fill;
             pageSteam.Location = new Point(0, 0);
             pageSteam.Name = "pageSteam";
-            pageSteam.Size = new Size(1010, 674);
+            pageSteam.Size = new Size(1010, 681);
             pageSteam.TabIndex = 2;
             pageSteam.Visible = false;
             // 
@@ -675,7 +888,7 @@ namespace ScumChecker
             panelSteamGridHost.Dock = DockStyle.Fill;
             panelSteamGridHost.Location = new Point(0, 78);
             panelSteamGridHost.Name = "panelSteamGridHost";
-            panelSteamGridHost.Size = new Size(1010, 596);
+            panelSteamGridHost.Size = new Size(1010, 603);
             panelSteamGridHost.TabIndex = 0;
             // 
             // dgvSteam
@@ -713,7 +926,7 @@ namespace ScumChecker
             dgvSteam.RowHeadersVisible = false;
             dgvSteam.RowTemplate.Height = 28;
             dgvSteam.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvSteam.Size = new Size(1010, 596);
+            dgvSteam.Size = new Size(1010, 603);
             dgvSteam.TabIndex = 0;
             // 
             // colSteamId
@@ -762,8 +975,6 @@ namespace ScumChecker
             panelSteamTop.Padding = new Padding(14, 12, 14, 12);
             panelSteamTop.Size = new Size(1010, 78);
             panelSteamTop.TabIndex = 1;
-
-
             // 
             // lblSteamTitle
             // 
@@ -794,7 +1005,7 @@ namespace ScumChecker
             pageNative.Dock = DockStyle.Fill;
             pageNative.Location = new Point(0, 0);
             pageNative.Name = "pageNative";
-            pageNative.Size = new Size(1010, 674);
+            pageNative.Size = new Size(1010, 681);
             pageNative.TabIndex = 3;
             // 
             // splitNative
@@ -814,8 +1025,8 @@ namespace ScumChecker
             // 
             splitNative.Panel2.Controls.Add(txtLog);
             splitNative.Panel2MinSize = 80;
-            splitNative.Size = new Size(1010, 520);
-            splitNative.SplitterDistance = 260;
+            splitNative.Size = new Size(1010, 527);
+            splitNative.SplitterDistance = 415;
             splitNative.SplitterWidth = 6;
             splitNative.TabIndex = 0;
             // 
@@ -854,7 +1065,7 @@ namespace ScumChecker
             dgvFindings.RowHeadersVisible = false;
             dgvFindings.RowTemplate.Height = 28;
             dgvFindings.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvFindings.Size = new Size(1010, 260);
+            dgvFindings.Size = new Size(1010, 415);
             dgvFindings.TabIndex = 0;
             // 
             // colSeverity
@@ -910,7 +1121,7 @@ namespace ScumChecker
             txtLog.Name = "txtLog";
             txtLog.ReadOnly = true;
             txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(1010, 254);
+            txtLog.Size = new Size(1010, 106);
             txtLog.TabIndex = 0;
             // 
             // panelTop
@@ -1128,20 +1339,44 @@ namespace ScumChecker
             lblCountInfo.TabIndex = 5;
             lblCountInfo.Text = "Info: 0";
             // 
-            // panelFooter
+            // PanelLogo
             // 
-            panelFooter.BackColor = Color.FromArgb(12, 12, 18);
-            panelFooter.Controls.Add(linkGitHub);
-            panelFooter.Controls.Add(linkBio);
-            panelFooter.Controls.Add(lblLang);
-            panelFooter.Controls.Add(cmbLang);
-            panelFooter.Controls.Add(lblMadeWith);
-            panelFooter.Dock = DockStyle.Bottom;
-            panelFooter.Location = new Point(12, 686);
-            panelFooter.Name = "panelFooter";
-            panelFooter.Padding = new Padding(12, 8, 12, 8);
-            panelFooter.Size = new Size(1010, 34);
-            panelFooter.TabIndex = 1;
+            PanelLogo.BackColor = Color.FromArgb(1, 1, 9);
+            PanelLogo.Controls.Add(buttonSvernut);
+            PanelLogo.Controls.Add(button3akrit);
+            PanelLogo.Dock = DockStyle.Top;
+            PanelLogo.Location = new Point(190, 0);
+            PanelLogo.Name = "PanelLogo";
+            PanelLogo.Size = new Size(1034, 27);
+            PanelLogo.TabIndex = 2;
+            // 
+            // button3akrit
+            // 
+            button3akrit.Dock = DockStyle.Right;
+            button3akrit.FlatAppearance.BorderSize = 0;
+            button3akrit.FlatStyle = FlatStyle.Flat;
+            button3akrit.Font = new Font("Segoe UI", 13F);
+            button3akrit.ForeColor = Color.White;
+            button3akrit.Location = new Point(1011, 0);
+            button3akrit.Name = "button3akrit";
+            button3akrit.Size = new Size(23, 27);
+            button3akrit.TabIndex = 0;
+            button3akrit.Text = "×";
+            button3akrit.UseVisualStyleBackColor = true;
+            // 
+            // buttonSvernut
+            // 
+            buttonSvernut.Dock = DockStyle.Right;
+            buttonSvernut.FlatAppearance.BorderSize = 0;
+            buttonSvernut.FlatStyle = FlatStyle.Flat;
+            buttonSvernut.Font = new Font("Segoe UI", 13F);
+            buttonSvernut.ForeColor = Color.White;
+            buttonSvernut.Location = new Point(988, 0);
+            buttonSvernut.Name = "buttonSvernut";
+            buttonSvernut.Size = new Size(23, 27);
+            buttonSvernut.TabIndex = 1;
+            buttonSvernut.Text = "-";
+            buttonSvernut.UseVisualStyleBackColor = true;
             // 
             // linkGitHub
             // 
@@ -1169,57 +1404,31 @@ namespace ScumChecker
             linkBio.Text = "e-z.bio/nezeryxs";
             linkBio.VisitedLinkColor = Color.FromArgb(160, 120, 255);
             // 
-            // lblLang
-            // 
-            lblLang.AutoSize = true;
-            lblLang.ForeColor = Color.Gainsboro;
-            lblLang.Location = new Point(300, 9);
-            lblLang.Name = "lblLang";
-            lblLang.Size = new Size(36, 15);
-            lblLang.TabIndex = 2;
-            lblLang.Text = "Lang:";
-            // 
-            // cmbLang
-            // 
-            cmbLang.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbLang.FlatStyle = FlatStyle.Flat;
-            cmbLang.FormattingEnabled = true;
-            cmbLang.Items.AddRange(new object[] { "RU", "EN" });
-            cmbLang.Location = new Point(340, 6);
-            cmbLang.Name = "cmbLang";
-            cmbLang.Size = new Size(70, 23);
-            cmbLang.TabIndex = 3;
-            // 
-            // lblMadeWith
-            // 
-            lblMadeWith.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            lblMadeWith.AutoSize = true;
-            lblMadeWith.ForeColor = Color.Gainsboro;
-            lblMadeWith.Location = new Point(885, 9);
-            lblMadeWith.Name = "lblMadeWith";
-            lblMadeWith.Size = new Size(113, 15);
-            lblMadeWith.TabIndex = 4;
-            lblMadeWith.Text = "Made with ChatGPT";
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(8, 8, 12);
-            BackgroundImage = Properties.Resources.load;
+            BackgroundImage = Properties.Resources.fon13;
             BackgroundImageLayout = ImageLayout.Stretch;
             ClientSize = new Size(1224, 720);
+            ControlBox = false;
             Controls.Add(panelMain);
+            Controls.Add(PanelLogo);
             Controls.Add(panelSidebar);
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
+            MinimizeBox = false;
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "ScumChecker by nezeryxs";
+            Text = "ScumChecker - build: Release";
             Load += Form1_Load;
             panelSidebar.ResumeLayout(false);
+            panelFooter.ResumeLayout(false);
+            panelFooter.PerformLayout();
+            panel1.ResumeLayout(false);
             panelMain.ResumeLayout(false);
             panelPages.ResumeLayout(false);
             pageQuick.ResumeLayout(false);
@@ -1250,8 +1459,7 @@ namespace ScumChecker
             panelProgressTrack.ResumeLayout(false);
             panelSummary.ResumeLayout(false);
             panelSummary.PerformLayout();
-            panelFooter.ResumeLayout(false);
-            panelFooter.PerformLayout();
+            PanelLogo.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -1272,5 +1480,14 @@ namespace ScumChecker
         #endregion
 
         private Button button1;
+        private Button Git_button;
+        private Button ezbio;
+        private Panel panelFooter;
+        private Label lblLang;
+        private ComboBox cmbLang;
+        private Panel PanelLogo;
+        private Button button3akrit;
+        private Button buttonSvernut;
+        private Panel panel1;
     }
 }

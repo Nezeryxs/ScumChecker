@@ -13,8 +13,10 @@
 
 **ScumChecker** — офлайн-инструмент для администраторов серверов **SCUM**, предназначенный для помощи при ручных проверках игроков.
 
-ScumChecker **не отправляет данные**, **не загружает файлы** и **не взаимодействует с внешними серверами**.  
-Вся обработка выполняется **локально на компьютере администратора**.
+ScumChecker предназначен как вспомогательный инструмент при проверках игроков.
+Он помогает собрать технический контекст, но не заменяет решение администратора.
+
+
 
 ---
 
@@ -22,8 +24,7 @@ ScumChecker **не отправляет данные**, **не загружае�
 
 **ScumChecker** is an offline tool for **SCUM** server administrators, designed to assist with **manual player investigations**.
 
-ScumChecker **does not send data**, **does not upload files**, and **does not communicate with external servers**.  
-All processing is performed **locally on the administrator’s machine**.
+ScumChecker is intended as a **support tool** during investigations. It helps collect technical context but **does not replace human judgment**.
 
 ---
 ## ⬇️ Скачать / Download
@@ -175,5 +176,5 @@ You are free to use, modify, and distribute it with attribution.
 GitHub: https://github.com/Nezeryxs  
 Bio: https://e-z.bio/nezeryxs  
 
-> Проект создан при помощи ChatGPT  
-> Project created with the assistance of ChatGPT
+> В разработке проекта использовались вспомогательные AI-инструменты (ChatGPT).  
+> Parts of this project were developed with the assistance of AI tools (ChatGPT).

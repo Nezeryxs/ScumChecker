@@ -73,7 +73,7 @@ After downloading:
     <td><img width="420" alt="Steam Scan" src="assets/steammenu.png"></td>
   </tr>
   <tr>
-    <td><img width="420" alt="Programs" src="assets/progmenu.png"></td>
+    <td><img width="420" alt="Programs" src="assets/erfefsdfs.png"></td>
     <td><img width="420" alt="Tools" src="assets/toolmenu.png"></td>
   </tr>
 </table>

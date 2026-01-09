@@ -5,8 +5,7 @@
 ![GitHub license](https://img.shields.io/github/license/Nezeryxs/ScumChecker?style=flat-square)
 ![Platform](https://img.shields.io/badge/platform-Windows-blue?style=flat-square)
 ![Made with C#](https://img.shields.io/badge/Made%20with-C%23-239120?style=flat-square)
-![Status]([https://img.shields.io/badge/status-ambiguous-red](https://img.shields.io/badge/status-maintenance-orange?style=for-the-badge
-)
+![Status](https://img.shields.io/badge/status-maintenance-orange?style=for-the-badge)
 
 ---
 

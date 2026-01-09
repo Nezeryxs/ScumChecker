@@ -29,6 +29,7 @@ namespace ScumChecker.Core.Modules
 
                 string name;
                 int pid = -1;
+                string? path = null;
 
                 try
                 {
@@ -55,6 +56,35 @@ namespace ScumChecker.Core.Modules
                     };
 
                     continue;
+                }
+
+                try
+                {
+                    path = p.MainModule?.FileName;
+                }
+                catch
+                {
+                    path = null;
+                }
+
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    bool isUnsigned = !SuspicionKeywords.HasValidDigitalSignature(path);
+                    bool inUserSpace = SuspicionKeywords.IsUserSpacePath(path);
+                    if (isUnsigned && inUserSpace)
+                    {
+                        var sev = SuspicionKeywords.IsTempPath(path) ? Severity.High : Severity.Medium;
+                        yield return new ScanItem
+                        {
+                            Severity = sev,
+                            Group = sev == Severity.High ? FindingGroup.HighRisk : FindingGroup.Suspicious,
+                            Category = "Processes",
+                            Title = "Unsigned process running from user-space",
+                            Reason = "Executable without valid signature is running from user profile or temp location",
+                            Recommendation = "Manual review. Confirm source and intent before action.",
+                            Details = $"{name} (PID {pid}) — {path}"
+                        };
+                    }
                 }
 
                 // для keywords

@@ -22,36 +22,59 @@ namespace ScumChecker.Core
         {
             var result = new ScanResult();
 
-            // модули типооооо 
             IScanModule[] modules =
             [
                 new HwidModule(),
-                new SteamAccountsModule(),
-                new ProcessesModule(),
-                new SuspiciousFilesModule(),
-            ];
+        new SteamAccountsModule(),
+        new ProcessesModule(),
+        new SuspiciousFilesModule(),
+    ];
 
             EmitLog($"Modules: {modules.Length}");
 
-            for (int i = 0; i < modules.Length; i++)
+            try
             {
-                ct.ThrowIfCancellationRequested();
-
-                var m = modules[i];
-                var basePct = (int)(i * 100.0 / modules.Length);
-                EmitProgress(basePct, m.Name);
-                EmitLog($"Running: {m.Name}");
-
-                foreach (var item in m.Run(ct))
+                for (int i = 0; i < modules.Length; i++)
                 {
-                    result.Items.Add(item);
-                    EmitItem(item);
-                }
-            }
+                    ct.ThrowIfCancellationRequested();
 
-            EmitProgress(100, "Done");
-            EmitLog("Scan completed.");
-            return result;
+                    var m = modules[i];
+                    var basePct = (int)(i * 100.0 / modules.Length);
+                    EmitProgress(basePct, m.Name);
+                    EmitLog($"Running: {m.Name}");
+
+                    try
+                    {
+                        foreach (var item in m.Run(ct))
+                        {
+                            ct.ThrowIfCancellationRequested();
+
+                            result.Items.Add(item);
+                            EmitItem(item);
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // отмена во время конкретного модуля — пробрасываем наружу
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        // модуль упал — не валим весь скан, просто логируем и идём дальше
+                        EmitLog($"Module failed: {m.Name} | {ex.GetType().Name}: {ex.Message}");
+                    }
+                }
+
+                EmitProgress(100, "Done");
+                EmitLog("Scan completed.");
+                return result;
+            }
+            catch (OperationCanceledException)
+            {
+                EmitProgress(100, "Canceled");
+                EmitLog("Scan canceled.");
+                return result; // вернём то, что успели найти
+            }
         }
     }
 }

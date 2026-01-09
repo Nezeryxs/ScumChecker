@@ -237,5 +237,64 @@ namespace ScumChecker.Core.Modules
                 return false;
             }
         }
+
+        public static bool IsUserSpacePath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return false;
+
+            string fullPath;
+            try
+            {
+                fullPath = Path.GetFullPath(path);
+            }
+            catch
+            {
+                return false;
+            }
+
+            foreach (var root in GetUserSpaceRoots())
+            {
+                if (string.IsNullOrWhiteSpace(root)) continue;
+                if (fullPath.StartsWith(NormalizeRoot(root), StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsTempPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return false;
+
+            string fullPath;
+            try
+            {
+                fullPath = Path.GetFullPath(path);
+            }
+            catch
+            {
+                return false;
+            }
+
+            var tempRoot = Path.GetTempPath();
+            if (string.IsNullOrWhiteSpace(tempRoot)) return false;
+
+            return fullPath.StartsWith(NormalizeRoot(tempRoot), StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string NormalizeRoot(string path)
+            => path.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+
+        private static IEnumerable<string> GetUserSpaceRoots()
+        {
+            var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            yield return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            yield return localAppData;
+            yield return Path.Combine(localAppData, "Programs");
+            yield return Path.Combine(userProfile, "Downloads");
+            yield return Path.GetTempPath();
+        }
     }
 }

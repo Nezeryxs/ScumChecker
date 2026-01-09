@@ -10,46 +10,69 @@ namespace ScumChecker.Core.Modules
     {
         public string Name => "Filesystem (scan)";
 
-        private const int MaxDepth = 5;
+        private const int DefaultMaxDepth = 5;
         private const int MaxHits = 300;
+
+        private sealed class RootScan
+        {
+            public RootScan(string path, int maxDepth)
+            {
+                Path = path;
+                MaxDepth = maxDepth;
+            }
+
+            public string Path { get; }
+            public int MaxDepth { get; }
+        }
 
         public IEnumerable<ScanItem> Run(CancellationToken ct)
         {
-            var roots = GetRoots();
             int hits = 0;
 
-            foreach (var root in roots)
+            foreach (var root in GetRoots())
             {
                 ct.ThrowIfCancellationRequested();
-                if (!Directory.Exists(root)) continue;
 
-                foreach (var item in ScanDir(root, 0, ct))
+                if (string.IsNullOrWhiteSpace(root.Path)) continue;
+                if (!Directory.Exists(root.Path)) continue;
+
+                foreach (var found in ScanDir(root.Path, 0, ct, root.MaxDepth))
                 {
-                    yield return item;
+                    yield return found;
                     if (++hits >= MaxHits) yield break;
                 }
             }
         }
 
-        private static IEnumerable<string> GetRoots()
+        private static IEnumerable<RootScan> GetRoots()
         {
-            yield return Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            yield return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), DefaultMaxDepth);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DefaultMaxDepth);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), 2);
 
-            // ✅ Downloads (нет SpecialFolder.Downloads)
-            yield return Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                "Downloads"
+            // Downloads (нет SpecialFolder.Downloads)
+            yield return new RootScan(
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"),
+                DefaultMaxDepth
             );
 
-            yield return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            yield return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            yield return Path.GetTempPath();
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), DefaultMaxDepth);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DefaultMaxDepth);
+
+            yield return new RootScan(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"), 3);
+            yield return new RootScan(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp"), 2);
+
+            yield return new RootScan(Path.GetTempPath(), 2);
+
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), 2);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), 2);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), 2);
         }
 
-        private static IEnumerable<ScanItem> ScanDir(string dir, int depth, CancellationToken ct)
+        private static IEnumerable<ScanItem> ScanDir(string dir, int depth, CancellationToken ct, int maxDepth)
         {
-            if (depth > MaxDepth) yield break;
+            if (depth > maxDepth) yield break;
+            if (ShouldSkipDirectory(dir)) yield break;
 
             IEnumerable<string> subDirs;
             IEnumerable<string> files;
@@ -66,6 +89,16 @@ namespace ScumChecker.Core.Modules
 
                 var name = Path.GetFileName(f);
                 var ext = Path.GetExtension(f).ToLowerInvariant();
+
+                bool isExec = ext is ".exe" or ".dll" or ".sys";
+                bool inUserSpace = SuspicionKeywords.IsUserSpacePath(f);
+                bool hasSignature = SuspicionKeywords.HasValidDigitalSignature(f);
+                bool isCritical = SuspicionKeywords.ContainsCritical($"{name} {f}");
+
+                bool nameSuspicious =
+                    !hasSignature &&
+                    (isCritical ||
+                     SuspicionKeywords.ContainsAny($"{name} {f}", SuspicionKeywords.Generic, SuspicionKeywords.ScumNames));
 
                 // devtools (dnSpy и т.п.)
                 if (SuspicionKeywords.ContainsAny(name, SuspicionKeywords.DevTools))
@@ -84,15 +117,15 @@ namespace ScumChecker.Core.Modules
                     continue;
                 }
 
-                // generic suspicious keywords
-                if (SuspicionKeywords.ContainsAny(name, SuspicionKeywords.Generic))
+                // suspicious by keyword (только если реально suspicious по правилам выше)
+                if (nameSuspicious)
                 {
-                    // усиливаем риск, если это исполняемое/драйвер и лежит в Temp/AppData
-                    bool isExec = ext is ".exe" or ".dll" or ".sys";
-                    bool inUserSpace = f.Contains(@"\AppData\", StringComparison.OrdinalIgnoreCase)
-                                       || f.Contains(@"\Temp\", StringComparison.OrdinalIgnoreCase);
+                    // усиливаем риск, если это исполняемое/драйвер и лежит в AppData/Temp
+                    bool inHotUserSpace =
+                        f.Contains(@"\AppData\", StringComparison.OrdinalIgnoreCase) ||
+                        f.Contains(@"\Temp\", StringComparison.OrdinalIgnoreCase);
 
-                    var sev = (isExec && inUserSpace) ? Severity.High : Severity.Medium;
+                    var sev = ((isExec && inHotUserSpace) || isCritical) ? Severity.High : Severity.Medium;
                     var grp = (sev == Severity.High) ? FindingGroup.HighRisk : FindingGroup.Suspicious;
 
                     yield return new ScanItem
@@ -101,12 +134,34 @@ namespace ScumChecker.Core.Modules
                         Group = grp,
                         Category = "Filesystem",
                         What = isExec ? "Suspicious executable name" : "Suspicious filename",
-                        Reason = isExec && inUserSpace
-                            ? "Executable/driver-like file in user-space (AppData/Temp) with suspicious keyword"
-                            : "Name contains suspicious keyword (needs manual review)",
+                        Reason = isCritical
+                            ? "Critical keyword detected in filename/path"
+                            : (isExec && inHotUserSpace
+                                ? "Executable/driver-like file in user-space (AppData/Temp) with suspicious keyword"
+                                : "Name contains suspicious keyword (needs manual review)"),
                         Recommendation = sev == Severity.High
                             ? "Manual review + ask user. Consider action if confirmed."
                             : "Manual review. Do not ban by this alone.",
+                        Details = name,
+                        EvidencePath = f
+                    };
+
+                    continue;
+                }
+
+                // unsigned executable in user-space (отдельное правило)
+                if (isExec && inUserSpace && !hasSignature)
+                {
+                    var sev = SuspicionKeywords.IsTempPath(f) ? Severity.High : Severity.Medium;
+
+                    yield return new ScanItem
+                    {
+                        Severity = sev,
+                        Group = sev == Severity.High ? FindingGroup.HighRisk : FindingGroup.Suspicious,
+                        Category = "Filesystem",
+                        What = "Unsigned executable in user-space",
+                        Reason = "Unsigned executable/driver-like file running from user profile or temp location",
+                        Recommendation = "Manual review. Confirm origin and intent before action.",
                         Details = name,
                         EvidencePath = f
                     };
@@ -116,9 +171,62 @@ namespace ScumChecker.Core.Modules
             foreach (var d in subDirs)
             {
                 ct.ThrowIfCancellationRequested();
-                foreach (var nested in ScanDir(d, depth + 1, ct))
+
+                if (SuspicionKeywords.IsDirectorySuspicious(d))
+                {
+                    var name = Path.GetFileName(d);
+                    bool isCritical = SuspicionKeywords.ContainsCritical($"{name} {d}");
+                    var sev = isCritical ? Severity.High : Severity.Medium;
+
+                    yield return new ScanItem
+                    {
+                        Severity = sev,
+                        Group = sev == Severity.High ? FindingGroup.HighRisk : FindingGroup.Suspicious,
+                        Category = "Filesystem",
+                        What = "Suspicious folder",
+                        Reason = isCritical
+                            ? "Critical keyword detected in folder name/path"
+                            : "Folder name/path contains suspicious keyword",
+                        Recommendation = sev == Severity.High
+                            ? "Manual review + ask user. Consider action if confirmed."
+                            : "Manual review. Do not ban by this alone.",
+                        Details = name,
+                        EvidencePath = d
+                    };
+                }
+
+                foreach (var nested in ScanDir(d, depth + 1, ct, maxDepth))
                     yield return nested;
             }
+        }
+
+        private static bool ShouldSkipDirectory(string dir)
+        {
+            try
+            {
+                var info = new DirectoryInfo(dir);
+
+                // не лезем в reparse points (симлинки/джанкшены)
+                if (info.Attributes.HasFlag(FileAttributes.ReparsePoint)) return true;
+
+                // системные папки часто закрыты правами + не нужны
+                if (info.Attributes.HasFlag(FileAttributes.System)) return true;
+            }
+            catch
+            {
+                return true;
+            }
+
+            var name = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar));
+
+            if (string.Equals(name, "$Recycle.Bin", StringComparison.OrdinalIgnoreCase)) return true;
+            if (string.Equals(name, "System Volume Information", StringComparison.OrdinalIgnoreCase)) return true;
+
+            // Windows/WinSxS обычно бесполезно и шумит
+            if (string.Equals(name, "Windows", StringComparison.OrdinalIgnoreCase)) return true;
+            if (string.Equals(name, "WinSxS", StringComparison.OrdinalIgnoreCase)) return true;
+
+            return false;
         }
     }
 }

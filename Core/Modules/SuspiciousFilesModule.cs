@@ -11,7 +11,7 @@ namespace ScumChecker.Core.Modules
         public string Name => "Filesystem (scan)";
 
         private const int DefaultMaxDepth = 5;
-        private const int MaxHits = 300;
+        private const int MaxReportedHits = 500;
 
         private sealed class RootScan
         {
@@ -38,8 +38,12 @@ namespace ScumChecker.Core.Modules
 
                 foreach (var found in ScanDir(root.Path, 0, ct, root.MaxDepth))
                 {
-                    yield return found;
-                    if (++hits >= MaxHits) yield break;
+                    if (hits < MaxReportedHits)
+                    {
+                        yield return found;
+                    }
+
+                    hits++;
                 }
             }
         }
@@ -47,7 +51,9 @@ namespace ScumChecker.Core.Modules
         private static IEnumerable<RootScan> GetRoots()
         {
             yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), DefaultMaxDepth);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory), DefaultMaxDepth);
             yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DefaultMaxDepth);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), DefaultMaxDepth);
             yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), 2);
 
             // Downloads (нет SpecialFolder.Downloads)
@@ -56,11 +62,24 @@ namespace ScumChecker.Core.Modules
                 DefaultMaxDepth
             );
 
+            yield return new RootScan(
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Saved Games"),
+                DefaultMaxDepth
+            );
+            yield return new RootScan(
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games"),
+                DefaultMaxDepth
+            );
+
             yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), DefaultMaxDepth);
             yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DefaultMaxDepth);
 
             yield return new RootScan(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"), 3);
             yield return new RootScan(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp"), 2);
+            yield return new RootScan(
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft", "Windows", "Start Menu", "Programs", "Startup"),
+                DefaultMaxDepth
+            );
 
             yield return new RootScan(Path.GetTempPath(), 2);
 
@@ -89,16 +108,20 @@ namespace ScumChecker.Core.Modules
 
                 var name = Path.GetFileName(f);
                 var ext = Path.GetExtension(f).ToLowerInvariant();
+                var haystack = $"{name} {f}";
 
                 bool isExec = ext is ".exe" or ".dll" or ".sys";
                 bool inUserSpace = SuspicionKeywords.IsUserSpacePath(f);
                 bool hasSignature = SuspicionKeywords.HasValidDigitalSignature(f);
-                bool isCritical = SuspicionKeywords.ContainsCritical($"{name} {f}");
+                bool hasConfigHint = SuspicionKeywords.ContainsConfigHint(haystack);
+                bool hasKeywords = SuspicionKeywords.ContainsAny(haystack, SuspicionKeywords.Generic, SuspicionKeywords.ScumNames);
+                bool isCritical = SuspicionKeywords.ContainsCritical(haystack);
 
                 bool nameSuspicious =
                     !hasSignature &&
                     (isCritical ||
-                     SuspicionKeywords.ContainsAny($"{name} {f}", SuspicionKeywords.Generic, SuspicionKeywords.ScumNames));
+                     hasKeywords ||
+                     (hasConfigHint && hasKeywords));
 
                 // devtools (dnSpy и т.п.)
                 if (SuspicionKeywords.ContainsAny(name, SuspicionKeywords.DevTools))
@@ -120,13 +143,36 @@ namespace ScumChecker.Core.Modules
                 // suspicious by keyword (только если реально suspicious по правилам выше)
                 if (nameSuspicious)
                 {
-                    // усиливаем риск, если это исполняемое/драйвер и лежит в AppData/Temp
                     bool inHotUserSpace =
                         f.Contains(@"\AppData\", StringComparison.OrdinalIgnoreCase) ||
                         f.Contains(@"\Temp\", StringComparison.OrdinalIgnoreCase);
 
-                    var sev = ((isExec && inHotUserSpace) || isCritical) ? Severity.High : Severity.Medium;
-                    var grp = (sev == Severity.High) ? FindingGroup.HighRisk : FindingGroup.Suspicious;
+                    Severity sev;
+                    FindingGroup grp;
+                    string reason;
+
+                    if (isCritical)
+                    {
+                        sev = Severity.High;
+                        reason = "Critical keyword detected in filename/path";
+                    }
+                    else if (isExec && inHotUserSpace)
+                    {
+                        sev = Severity.High;
+                        reason = "Suspicious executable/driver-like file in AppData/Temp";
+                    }
+                    else if (hasConfigHint)
+                    {
+                        sev = (isExec || inUserSpace) ? Severity.Medium : Severity.Low;
+                        reason = "Config-like file with suspicious keyword";
+                    }
+                    else
+                    {
+                        sev = (isExec || inUserSpace) ? Severity.Medium : Severity.Low;
+                        reason = "Name contains suspicious keyword (needs manual review)";
+                    }
+
+                    grp = (sev == Severity.High) ? FindingGroup.HighRisk : FindingGroup.Suspicious;
 
                     yield return new ScanItem
                     {
@@ -134,14 +180,12 @@ namespace ScumChecker.Core.Modules
                         Group = grp,
                         Category = "Filesystem",
                         What = isExec ? "Suspicious executable name" : "Suspicious filename",
-                        Reason = isCritical
-                            ? "Critical keyword detected in filename/path"
-                            : (isExec && inHotUserSpace
-                                ? "Executable/driver-like file in user-space (AppData/Temp) with suspicious keyword"
-                                : "Name contains suspicious keyword (needs manual review)"),
+                        Reason = reason,
                         Recommendation = sev == Severity.High
                             ? "Manual review + ask user. Consider action if confirmed."
-                            : "Manual review. Do not ban by this alone.",
+                            : (sev == Severity.Medium
+                                ? "Manual review. Do not ban by this alone."
+                                : "Use as context only."),
                         Details = name,
                         EvidencePath = f
                     };

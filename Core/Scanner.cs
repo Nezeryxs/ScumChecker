@@ -50,7 +50,14 @@ namespace ScumChecker.Core
                             ct.ThrowIfCancellationRequested();
 
                             result.Items.Add(item);
-                            EmitItem(item);
+                            try
+                            {
+                                EmitItem(item);
+                            }
+                            catch (Exception ex)
+                            {
+                                EmitLog($"Item handler failed: {ex.GetType().Name}: {ex.Message}");
+                            }
                         }
                     }
                     catch (OperationCanceledException)

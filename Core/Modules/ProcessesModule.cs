@@ -30,6 +30,10 @@ namespace ScumChecker.Core.Modules
                 string name;
                 int pid = -1;
                 string? path = null;
+                bool reportedUnsigned = false;
+                bool hasPath = false;
+                bool isUnsigned = false;
+                bool inUserSpace = false;
 
                 try
                 {
@@ -69,8 +73,10 @@ namespace ScumChecker.Core.Modules
 
                 if (!string.IsNullOrWhiteSpace(path))
                 {
-                    bool isUnsigned = !SuspicionKeywords.HasValidDigitalSignature(path);
-                    bool inUserSpace = SuspicionKeywords.IsUserSpacePath(path);
+                    hasPath = true;
+                    isUnsigned = !SuspicionKeywords.HasValidDigitalSignature(path);
+                    inUserSpace = SuspicionKeywords.IsUserSpacePath(path);
+
                     if (isUnsigned && inUserSpace)
                     {
                         var sev = SuspicionKeywords.IsTempPath(path) ? Severity.High : Severity.Medium;
@@ -82,21 +88,42 @@ namespace ScumChecker.Core.Modules
                             Title = "Unsigned process running from user-space",
                             Reason = "Executable without valid signature is running from user profile or temp location",
                             Recommendation = "Manual review. Confirm source and intent before action.",
-                            Details = $"{name} (PID {pid}) — {path}"
+                            Details = $"{name} (PID {pid}) - {path}"
                         };
+
+                        reportedUnsigned = true;
                     }
                 }
 
                 // для keywords
                 if (SuspicionKeywords.ContainsAny(name, SuspicionKeywords.Generic))
                 {
+                    if (reportedUnsigned) continue;
+
+                    Severity sev = Severity.Medium;
+                    string reason = "Process name contains suspicious keyword";
+
+                    if (hasPath)
+                    {
+                        if (isUnsigned || inUserSpace)
+                        {
+                            sev = Severity.Medium;
+                            reason = "Suspicious name with unsigned or user-space process path";
+                        }
+                        else
+                        {
+                            sev = Severity.Low;
+                            reason = "Suspicious name but signed and not in user-space";
+                        }
+                    }
+
                     yield return new ScanItem
                     {
-                        Severity = Severity.Medium,
-                        Group = FindingGroup.Suspicious,
+                        Severity = sev,
+                        Group = sev == Severity.High ? FindingGroup.HighRisk : FindingGroup.Suspicious,
                         Category = "Processes",
                         Title = "Suspicious process name",
-                        Reason = "Process name contains suspicious keyword",
+                        Reason = reason,
                         Recommendation = "Manual review. Do not ban by this alone.",
                         Details = $"{name} (PID {pid})"
                     };

@@ -38,8 +38,6 @@ namespace ScumChecker.Core.Modules
             "autoclicker", "auto clicker", "autofire", "auto fire",
             "recoil macro", "no recoil macro", "macros", "macro",
 
-            "cfg", "config",
-
             // unban / unlock
             "unban", "unlocker", "unlock all", "vac bypass", "vac bypasser"
         ];
@@ -88,21 +86,41 @@ namespace ScumChecker.Core.Modules
         // ====== Критичные (красные) слова/бренды -> для High
         public static readonly string[] Critical =
         [
-            "cfg", "config", "esp", "wh", "aim", "vac", "bhop",
             "ingram", "shack", "pheonix", "aj", "arcane", "baunt", "mason",
             "hyper", "dma", "external", "xone", "interium", "midnight", "loader",
         ];
 
+        private static readonly string[] ConfigTokens =
+        [
+            "cfg", "config"
+        ];
+
         // матчим аккуратно: токены/слова/части имени + расширение .cfg
         private static readonly Regex CriticalRegex = new Regex(
-            $@"(?i)(?<!\w)({string.Join("|", Critical.Select(Regex.Escape))})(?!\w)|(\.cfg\b)",
+            $@"(?i)(?<!\w)({string.Join("|", Critical.Select(Regex.Escape))})(?!\w)",
+            RegexOptions.Compiled
+        );
+
+        private static readonly Regex ConfigRegex = new Regex(
+            $@"(?i)(?<!\w)({string.Join("|", ConfigTokens.Select(Regex.Escape))})(?!\w)|(\.cfg\b)",
             RegexOptions.Compiled
         );
 
         public static bool ContainsCritical(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return false;
-            return CriticalRegex.IsMatch(text);
+            if (CriticalRegex.IsMatch(text)) return true;
+
+            if (ConfigRegex.IsMatch(text))
+                return ContainsAny(text, Generic, ScumNames);
+
+            return false;
+        }
+
+        public static bool ContainsConfigHint(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return false;
+            return ConfigRegex.IsMatch(text);
         }
 
         // короткие токены лучше искать как отдельные слова

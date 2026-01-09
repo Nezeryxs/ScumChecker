@@ -11,7 +11,7 @@ namespace ScumChecker.Core.Modules
         public string Name => "Filesystem (scan)";
 
         private const int DefaultMaxDepth = 5;
-        private const int MaxHits = 300;
+        private const int MaxReportedHits = 500;
 
         private sealed class RootScan
         {
@@ -38,8 +38,12 @@ namespace ScumChecker.Core.Modules
 
                 foreach (var found in ScanDir(root.Path, 0, ct, root.MaxDepth))
                 {
-                    yield return found;
-                    if (++hits >= MaxHits) yield break;
+                    if (hits < MaxReportedHits)
+                    {
+                        yield return found;
+                    }
+
+                    hits++;
                 }
             }
         }
@@ -47,12 +51,22 @@ namespace ScumChecker.Core.Modules
         private static IEnumerable<RootScan> GetRoots()
         {
             yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), DefaultMaxDepth);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory), DefaultMaxDepth);
             yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), DefaultMaxDepth);
+            yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments), DefaultMaxDepth);
             yield return new RootScan(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), 2);
 
             // Downloads (нет SpecialFolder.Downloads)
             yield return new RootScan(
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"),
+                DefaultMaxDepth
+            );
+            yield return new RootScan(
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Saved Games"),
+                DefaultMaxDepth
+            );
+            yield return new RootScan(
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "My Games"),
                 DefaultMaxDepth
             );
 
@@ -61,6 +75,10 @@ namespace ScumChecker.Core.Modules
 
             yield return new RootScan(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"), 3);
             yield return new RootScan(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp"), 2);
+            yield return new RootScan(
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft", "Windows", "Start Menu", "Programs", "Startup"),
+                DefaultMaxDepth
+            );
 
             yield return new RootScan(Path.GetTempPath(), 2);
 
